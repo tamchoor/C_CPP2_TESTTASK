@@ -27,6 +27,7 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir, t_info *i
 		}
 		info->thread = current_thread;
 	}
+	current_thread->dir = NULL;
 	current_thread->block = &info->block;
 	current_thread->next = NULL;
 
@@ -35,7 +36,20 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir, t_info *i
 		if (diren->d_type == 4 && diren->d_name[0] != '.')
 		{
 			new_dir = ft_strjoin_path(dir, diren->d_name);
-			current_thread->dir = new_dir;
+			if (!current_thread->dir)
+				current_thread->dir = new_dir;
+			else
+			{
+				current_thread->next = (t_threads *)calloc(1, sizeof(t_threads));
+				if (!current_thread->next)
+				{
+					write_error_and_exit("cycle_through_files:", 0, ": calloc error.\n", FP);
+				}
+				current_thread = current_thread->next;
+				current_thread->block = &info->block;
+				current_thread->next = NULL;
+				current_thread->dir = new_dir;
+			}
 			if (pthread_create(&current_thread->thread, NULL, searching_in_current_dir, (info)) != 0)
 			{
 				write_error_and_exit("cycle_through_files:", 0, ": pthread_creat error.\n", FP);
@@ -52,7 +66,6 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir, t_info *i
 		}
 		diren = readdir(direct);
 	}
-	pthread_join (current_thread->thread, NULL);
 }
 
 /* открытие текущей директории для чтения из нее и запуск цикла проверки*/
@@ -79,16 +92,10 @@ void *searching_in_current_dir(void *info1)
 			current_thread = current_thread->next;
 		if (chdir(current_thread->dir) == -1)
 		{
-			t_threads *first = info->thread;
-
-			while (first)
-			{
-				info->thread = info->thread->next;
-				free(first->dir);
-				free(first);
-				first = info->thread;
-			}
-			write_error_and_exit("1:", current_thread->dir, ": chdir error.\n", FP);
+			pthread_mutex_unlock(&info->block_forfree);
+			write (1, "!no such file or directory\n", 27);
+			write(1, current_thread->dir, strlen(current_thread->dir));
+			return ((void *) 0);
 		}
 	}
 	dir = NULL;
@@ -121,11 +128,17 @@ void	finder(char *dir)
 	info.dir = dir;
 	pthread_mutex_lock(&info.block_forfree);
 	searching_in_current_dir(&info);
+
+	t_threads *first = info.thread;
+	while (first)
+	{
+		pthread_join (first->thread, NULL);
+		first = first->next;
+	}
 	pthread_mutex_destroy(&info.block);
 	pthread_mutex_destroy(&info.block_forfree);
 
-	t_threads *first = info.thread;
-
+	first = info.thread;
 	while (first)
 	{
 		info.thread = info.thread->next;

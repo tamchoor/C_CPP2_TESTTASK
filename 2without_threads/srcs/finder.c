@@ -1,6 +1,5 @@
 #include "../find_file.h"
 
-
 void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir)
 {
 	char *new_dir;
