@@ -18,8 +18,7 @@ SOURCES_S =  main.c \
 			$(addprefix srcs/, $(SRCS_S)) 
 
 OBJS = $(SOURCES_S:%.c=%.o)
-OBJS_DIR = objs/
-OBJECTS	= $(addprefix $(OBJS_DIR), $(OBJS)) 
+
 
 GREEN = \033[0;32m
 RED = \033[0;31m
@@ -34,19 +33,17 @@ all: $(NAME)
 ALL_OBJS_DIR = $(DIR_SRC)
 
 
-$(NAME): $(OBJECTS) $(OBJS)
-	@$(CC) $(FLAGS) $(INCLUDES)  $(LIBRARIES) $(OBJECTS) -o $(NAME)
+$(NAME):  $(OBJS)
+	@$(CC) $(FLAGS) $(INCLUDES)  $(LIBRARIES) $(OBJS) -o $(NAME)
 	@echo "\n$(MARK) $(NAME): $(GREEN)object files were created$(RESET)"
 	@echo "$(MARK) $(NAME): $(GREEN)$(NAME) was created$(RESET)"
 
 
-$(OBJS_DIR)%.o : %.c $(HEADER)
-	@mkdir -p $(OBJS_DIR)
-	@mkdir -p  $(DIR_SRC)
+%.o : %.c $(HEADER)
 	$(CC) $(FLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	@rm -rf $(OBJECTS) $(OBJS_DIR)
+	@rm -rf $(OBJS)
 	@echo "$(NAME): $(RED) $(CROSS)object $(RED) files were deleted$(RESET)"
 
 fclean: clean

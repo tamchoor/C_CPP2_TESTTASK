@@ -25,6 +25,7 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir, t_info *i
 		{
 			write_error_and_exit("cycle_through_files:", 0, ": calloc error.\n", FP);
 		}
+		info->thread = current_thread;
 	}
 	current_thread->block = &info->block;
 	current_thread->next = NULL;
@@ -34,22 +35,12 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir, t_info *i
 		if (diren->d_type == 4 && diren->d_name[0] != '.')
 		{
 			new_dir = ft_strjoin_path(dir, diren->d_name);
-			// if (chdir(new_dir) != -1)
-			// {
-			// 	searching_in_current_dir(info);
-			// }
-			// else
-			// {
-			// 	write(2, "Can't check dir - ", 17);
-			// 	write(2, diren->d_name, strlen(diren->d_name));
-			// }
 			current_thread->dir = new_dir;
 			if (pthread_create(&current_thread->thread, NULL, searching_in_current_dir, (info)) != 0)
 			{
 				write_error_and_exit("cycle_through_files:", 0, ": pthread_creat error.\n", FP);
 			}
 			pthread_mutex_lock(&info->block_forfree);
-			// free(new_dir);
 		}
 		if (diren->d_name[0] != '.')
 		{
@@ -78,16 +69,26 @@ void *searching_in_current_dir(void *info1)
 	{
 		if (chdir(info->dir) == -1)
 		{
-			write_error_and_exit("main:", info->dir, ": chdir error.\n", FP);
+			write_error_and_exit("0:", info->dir, ": chdir error.\n", FP);
 		}
 	}
 	else 
 	{
+
 		while (current_thread->next)
 			current_thread = current_thread->next;
 		if (chdir(current_thread->dir) == -1)
 		{
-			write_error_and_exit("main:", current_thread->dir, ": chdir error.\n", FP);
+			t_threads *first = info->thread;
+
+			while (first)
+			{
+				info->thread = info->thread->next;
+				free(first->dir);
+				free(first);
+				first = info->thread;
+			}
+			write_error_and_exit("1:", current_thread->dir, ": chdir error.\n", FP);
 		}
 	}
 	dir = NULL;

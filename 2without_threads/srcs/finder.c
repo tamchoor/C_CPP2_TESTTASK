@@ -1,6 +1,5 @@
 #include "../find_file.h"
 
-void *searching_in_current_dir();
 
 void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir)
 {
@@ -13,7 +12,7 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir)
 			new_dir = ft_strjoin_path(dir, diren->d_name);
 			if (chdir(new_dir) != -1)
 			{
-				searching_in_current_dir();
+				finder();
 			}
 			else
 			{
@@ -33,7 +32,7 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir)
 }
 
 /* открытие текущей директории для чтения из нее и запуск цикла проверки*/
-void *searching_in_current_dir()
+void finder()
 {
 
 	char			*dir;
@@ -50,16 +49,4 @@ void *searching_in_current_dir()
 	free(dir);
 	if (closedir(direct) == -1)
 		write_error_and_exit("searching_in_current_dir:", 0, ": closedir error.\n", FP);
-	return ((void *) 0);
-}
-
-void	finder()
-{
-	// t_info info;
-
-	// if (pthread_mutex_init(&info.block, NULL) != 0)
-	// {
-	// 	write_error_and_exit("finder:", 0, ": pthread_mutex_init error.\n", FP);
-	// }
-	searching_in_current_dir();
 }
