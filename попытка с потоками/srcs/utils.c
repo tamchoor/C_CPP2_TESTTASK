@@ -1,4 +1,4 @@
-#include "../find_file.h"
+#include "find_file.h"
 
 char	*ft_strjoin_path(char const *s1, char const *s2)
 {

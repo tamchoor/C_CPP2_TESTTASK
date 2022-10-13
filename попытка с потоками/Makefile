@@ -19,7 +19,7 @@ SOURCES_S =  main.c \
 
 OBJS = $(SOURCES_S:%.c=%.o)
 OBJS_DIR = objs/
-OBJECTS	= $(addprefix $(OBJS_DIR), $(OBJS)) 
+OBJECTS	= $(addprefix $(OBJS_DIR), $(OBJS))
 
 GREEN = \033[0;32m
 RED = \033[0;31m
@@ -33,8 +33,7 @@ all: $(NAME)
 
 ALL_OBJS_DIR = $(DIR_SRC)
 
-
-$(NAME): $(OBJECTS) $(OBJS)
+$(NAME): $(OBJECTS)
 	@$(CC) $(FLAGS) $(INCLUDES)  $(LIBRARIES) $(OBJECTS) -o $(NAME)
 	@echo "\n$(MARK) $(NAME): $(GREEN)object files were created$(RESET)"
 	@echo "$(MARK) $(NAME): $(GREEN)$(NAME) was created$(RESET)"

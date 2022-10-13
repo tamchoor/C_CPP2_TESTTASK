@@ -1,8 +1,8 @@
-#include "find_file.h"
+#include "../find_file.h"
 
 void *searching_in_current_dir();
 
-void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir, t_info *info)
+void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir)
 {
 	char *new_dir;
 
@@ -33,7 +33,7 @@ void	cycle_through_files(DIR *direct, struct dirent *diren, char *dir, t_info *i
 }
 
 /* открытие текущей директории для чтения из нее и запуск цикла проверки*/
-void *searching_in_current_dir(t_info *info)
+void *searching_in_current_dir()
 {
 
 	char			*dir;
@@ -46,7 +46,7 @@ void *searching_in_current_dir(t_info *info)
 		write_error_and_exit("searching_in_current_dir:", 0, ": getcwd error.\n", FP);
 	direct = opendir(dir);
 	diren = readdir(direct);
-	cycle_through_files(direct, diren, dir, info);
+	cycle_through_files(direct, diren, dir);
 	free(dir);
 	if (closedir(direct) == -1)
 		write_error_and_exit("searching_in_current_dir:", 0, ": closedir error.\n", FP);
@@ -55,11 +55,11 @@ void *searching_in_current_dir(t_info *info)
 
 void	finder()
 {
-	t_info info;
+	// t_info info;
 
-	if (pthread_mutex_init(&info.block, NULL) != 0)
-	{
-		write_error_and_exit("finder:", 0, ": pthread_mutex_init error.\n", FP);
-	}
-	searching_in_current_dir(&info);
+	// if (pthread_mutex_init(&info.block, NULL) != 0)
+	// {
+	// 	write_error_and_exit("finder:", 0, ": pthread_mutex_init error.\n", FP);
+	// }
+	searching_in_current_dir();
 }

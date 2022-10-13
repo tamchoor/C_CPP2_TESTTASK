@@ -3,30 +3,34 @@
 
 #include <libc.h>
 #include <dirent.h>
-// # include <pthread.h>
+# include <pthread.h>
 
 # define FLAG_PERROR	19
 # define FP				19
 
-// # define STAR			42
-// # define QUEST			63
+# define STAR			42
+# define QUEST			63
 
-// # define FIRST			1
-// # define LAST			2
+# define FIRST			1
+# define LAST			2
 
-// typedef struct s_threads
-// {
-// 	pthread_t			thread;
-// 	struct treads	*next;
-// } t_threads;
+typedef struct s_threads
+{
+	pthread_t			thread;
+	pthread_mutex_t		*block;
+	char				*dir;
+	struct s_threads	*next;
+} t_threads;
 
 
-// typedef struct s_info
-// {
-// 	t_threads			*thread;
-// 	pthread_mutex_t		block;
+typedef struct s_info
+{
+	t_threads			*thread;
+	char				*dir;
+	pthread_mutex_t		block;
+	pthread_mutex_t		block_forfree;
 
-// } t_info;
+} t_info;
 
 
 /* utils.c */
@@ -51,6 +55,6 @@ void		print_current_file_with_path(struct dirent *diren, char *dir);
 // void searching_in_current_dir(t_part	*parts);
 // void	find_filename(char *filename);
 
-void	finder();
+void	finder(char *dir);
 
 #endif
